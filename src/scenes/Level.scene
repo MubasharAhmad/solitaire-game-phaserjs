@@ -1,0 +1,201 @@
+{
+    "id": "01aefa93-6044-4159-8358-7e91310aa05f",
+    "sceneType": "SCENE",
+    "settings": {
+        "preloadPackFiles": [],
+        "createMethodName": "editorCreate",
+        "sceneKey": "Level"
+    },
+    "displayList": [
+        {
+            "type": "Container",
+            "id": "d88c06ad-2489-4775-818a-4bbb957d67cb",
+            "label": "Top Bar",
+            "components": [],
+            "x": 1,
+            "list": [
+                {
+                    "type": "TileSprite",
+                    "id": "7e81b9dc-cc52-45b2-97f2-f3531e1a64c1",
+                    "label": "tilesprite_1",
+                    "components": [],
+                    "texture": {},
+                    "x": 403,
+                    "y": 25,
+                    "scaleX": 12.80173314451295,
+                    "scaleY": 0.9576815236056202,
+                    "tintTopLeft": "#d0d0d0",
+                    "tintTopRight": "#d0d0d0",
+                    "tintBottomLeft": "#d0d0d0",
+                    "tintBottomRight": "#d0d0d0",
+                    "tintFill": true,
+                    "width": 64,
+                    "height": 64
+                }
+            ]
+        },
+        {
+            "type": "Image",
+            "id": "e867a8c4-21aa-4ce1-badf-719afb478752",
+            "label": "placeholder",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 705,
+            "y": 142,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "9798518b-8b3b-4d6e-a07a-3a53d396c408",
+            "label": "placeholder_1",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 601,
+            "y": 142,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "df1d6a4a-1ed3-40c2-aa44-bb3c5585445d",
+            "label": "placeholder_2",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 497,
+            "y": 142,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "83959904-3c6c-42c1-95c4-69b3f5718cb5",
+            "label": "placeholder_3",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 393,
+            "y": 142,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "d7daeb49-e381-4cc5-bd66-a13d75ff8f47",
+            "label": "placeholder_4",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 393,
+            "y": 285,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "b9e9ae22-0555-4856-bfdc-da9fb4fa331a",
+            "label": "placeholder_5",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 497,
+            "y": 285,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "0aabf450-7858-4b70-9578-461edd76020a",
+            "label": "placeholder_6",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 601,
+            "y": 285,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "6df031a2-a7da-4650-9d56-b2b372f6aad3",
+            "label": "placeholder_7",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 705,
+            "y": 285,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "f62636a1-ea40-47f3-a875-3a41ee6bfa37",
+            "label": "placeholder_8",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 81,
+            "y": 285,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "38730974-8893-496a-9fd1-15ca9e64811f",
+            "label": "placeholder_9",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 185,
+            "y": 285,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "dd9da1ab-fe7d-470a-8226-56bac7496a06",
+            "label": "placeholder_10",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 289,
+            "y": 285,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        },
+        {
+            "type": "Image",
+            "id": "519bbe7c-acec-4ef6-98e5-dc5e7ffcaba3",
+            "label": "placeholder_11",
+            "components": [],
+            "texture": {
+                "key": "placeholder"
+            },
+            "x": 81,
+            "y": 142,
+            "scaleX": 0.2992899054086054,
+            "scaleY": 0.25373372306906
+        }
+    ],
+    "plainObjects": [],
+    "meta": {
+        "app": "Phaser Editor 2D - Scene Editor",
+        "url": "https://phasereditor2d.com",
+        "contentType": "phasereditor2d.core.scene.SceneContentType",
+        "version": 3
+    }
+}

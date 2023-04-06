@@ -4,13 +4,13 @@ window.addEventListener('load', function () {
 	var game = new Phaser.Game({
 		width: 800,
 		height: 600,
-		type: Phaser.WEBGL,
+		type: Phaser.AUTO,
         backgroundColor: "#ffffff",
 		scale: {
 			mode: Phaser.Scale.FIT
 		},
 		fps: {
-			target: 120
+			target: 60
 		},
 	});
 

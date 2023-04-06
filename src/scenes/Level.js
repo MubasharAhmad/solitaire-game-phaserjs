@@ -181,32 +181,56 @@ class Level extends Phaser.Scene {
 	setSpriteEvents(sprite, card) {
 		sprite.card = card;
 		card.sprite = sprite;
-		let cardsToMove = [];
 		let cardOrginalPositions = [];
 		let originalPileIndex;
+		let from;
 		sprite.on('pointerdown', (pointer) => {
 			// Keep track of the cards being dragged
 			let k;
-			let from;
-			console.log("card", card.sprite.x, card.sprite.y);
-			console.log("pointer", pointer.x, pointer.y);
-			this.tableau.forEach((pile) => {
-				pile.forEach((c) => {
-					c.sprite.setDepth(0);
+			for (let i = 0; i < this.tableau.length; i++) {
+				for (let j = 0; j < this.tableau[i].length; j++) {
+					let c = this.tableau[i][j];
 					if (c === card) {
-						k = pile.indexOf(c) + 1;
-						originalPileIndex = this.tableau.indexOf(pile);
+						k = j + 1;
+						originalPileIndex = i;
 						from = "tableau";
+						break;
 					}
-				});
-			});
+				}
+			}
 
+			// if card is from the deck
+			if (card === this.activeDeckCard) {
+				console.log(" from deck");
+				this.cardstomove = [card];
+				cardOrginalPositions = [{
+					x: card.sprite.x,
+					y: card.sprite.y
+				}];
+				let cardToMove = this.cardstomove[0];
+				cardToMove.sprite.x = pointer.x;
+				cardToMove.sprite.y = pointer.y + 57;
+				from = "deck";
+				this.deck.splice(this.deckIndex - 1, 1);
+				if (this.deckIndex > 0) {
+					this.deckIndex--;
+					this.activeDeckCard = this.deck[this.deckIndex];
+				} else {
+					this.activeDeckCard = null;
+				}
+				console.log(this.activeDeckCard);
+				console.log(this.deckIndex);
+			}
+
+			// if card is from the tableau piles
 			if (from === "tableau") {
-				cardsToMove = [card];
+				console.log(" from tableau");
+				this.cardstomove = [card];
+				console.log("card To Move", this.cardstomove[0]);
 				while (k < this.tableau[originalPileIndex].length) {
 					let nextCard = this.tableau[originalPileIndex][k];
 					if (nextCard.isFaceUp) {
-						cardsToMove.push(nextCard);
+						this.cardstomove.push(nextCard);
 					} else {
 						break;
 					}
@@ -215,8 +239,8 @@ class Level extends Phaser.Scene {
 
 				// Keep track of the original positions of the cards being dragged
 				cardOrginalPositions = [];
-				for (let l = 0; l < cardsToMove.length; l++) {
-					let cardToMove = cardsToMove[l];
+				for (let l = 0; l < this.cardstomove.length; l++) {
+					let cardToMove = this.cardstomove[l];
 					cardOrginalPositions.push({
 						x: cardToMove.sprite.x,
 						y: cardToMove.sprite.y
@@ -224,34 +248,26 @@ class Level extends Phaser.Scene {
 				}
 
 				// remove the cards from the tableau
-				for (let l = 0; l < cardsToMove.length; l++) {
-					let cardToMove = cardsToMove[l];
+				for (let l = 0; l < this.cardstomove.length; l++) {
+					let cardToMove = this.cardstomove[l];
 					let index = this.tableau[originalPileIndex].indexOf(cardToMove);
 					this.tableau[originalPileIndex].splice(index, 1);
 				}
 
 				// Update the position of the cards being dragged
-				for (let l = 0; l < cardsToMove.length; l++) {
-					let cardToMove = cardsToMove[l];
+				for (let l = 0; l < this.cardstomove.length; l++) {
+					let cardToMove = this.cardstomove[l];
 					cardToMove.sprite.depth = 5;
 					cardToMove.sprite.x = pointer.x;
 					cardToMove.sprite.y = pointer.y + (l * 20) + 57;
 				}
 			}
-		}, this);
-		sprite.on('pointermove', function (pointer) {
-			// Update the position of the cards being dragged
-			for (let l = 0; l < cardsToMove.length; l++) {
-				let cardToMove = cardsToMove[l];
-				cardToMove.sprite.depth = 5;
-				cardToMove.sprite.x = pointer.x;
-				cardToMove.sprite.y = pointer.y + (l * 20) + 57;
-			}
+			this.cardstomove = this.cardstomove;
 		}, this);
 		sprite.on('pointerup', function (pointer) {
 			let destPile = null;
 			if (pointer.y >= 225) {
-				destPile = this.getClosestValidPile(pointer.x, pointer.y, this.tableau, cardsToMove);
+				destPile = this.getClosestValidPile(pointer.x, pointer.y, this.tableau);
 				if (destPile) {
 					// Move the cards to the new pile
 					let x;
@@ -265,28 +281,30 @@ class Level extends Phaser.Scene {
 						y = 287;
 					}
 					let dl = (destPile.length > 0) ? 1 : 0;
-					for (let l = 0; l < cardsToMove.length; l++) {
-						let cardToMove = cardsToMove[l];
+					for (let l = 0; l < this.cardstomove.length; l++) {
+						let cardToMove = this.cardstomove[l];
 						cardToMove.sprite.depth = 0;
 						cardToMove.sprite.x = x;
 						cardToMove.sprite.y = y + ((l + dl) * 20);
 						destPile.push(cardToMove);
 					}
-					if (this.tableau[originalPileIndex].length > 0) {
-						let c = this.tableau[originalPileIndex][this.tableau[originalPileIndex].length - 1];
-						c.isFaceUp = true;
-						c.sprite.visible = true;
-						if (c.backImageSprite) c.backImageSprite.visible = false;
-						c.sprite.setInteractive();
-						this.setSpriteEvents(c.sprite, c, originalPileIndex);
+					if (from === "tableau") {
+						if (this.tableau[originalPileIndex].length > 0) {
+							let c = this.tableau[originalPileIndex][this.tableau[originalPileIndex].length - 1];
+							c.isFaceUp = true;
+							c.sprite.visible = true;
+							if (c.backImageSprite) c.backImageSprite.visible = false;
+							c.sprite.setInteractive();
+							this.setSpriteEvents(c.sprite, c, originalPileIndex);
+						}
 					}
 				}
 			} else {
-				destPile = this.getClosestValidFoundationPile(pointer.x, pointer.y, this.foundationPiles, cardsToMove);
+				destPile = this.getClosestValidFoundationPile(pointer.x, pointer.y, this.foundationPiles);
 				if (destPile) {
-					if (cardsToMove[0].rank === "A") {
+					if (this.cardstomove[0].rank === "A") {
 						for (let k = 0; k < this.foundationPiles.length; k++) {
-							if (this.foundationPiles[k].length === 1 && cardsToMove[0].suit === this.foundationPiles[k][0].suit) {
+							if (this.foundationPiles[k].length === 1 && this.cardstomove[0].suit === this.foundationPiles[k][0].suit) {
 								this.foundationPiles[k].pop();
 							}
 						}
@@ -299,20 +317,22 @@ class Level extends Phaser.Scene {
 					else {
 						x = this.foundationPilesStartX + this.foundationPiles.indexOf(destPile) * 104;
 					}
-					for (let l = 0; l < cardsToMove.length; l++) {
-						let cardToMove = cardsToMove[l];
+					for (let l = 0; l < this.cardstomove.length; l++) {
+						let cardToMove = this.cardstomove[l];
 						cardToMove.sprite.depth = 0;
 						cardToMove.sprite.x = x;
 						cardToMove.sprite.y = y + 62;
 						destPile.push(cardToMove);
 					}
-					if (this.tableau[originalPileIndex].length > 0) {
-						let c = this.tableau[originalPileIndex][this.tableau[originalPileIndex].length - 1];
-						c.isFaceUp = true;
-						c.sprite.visible = true;
-						c.backImageSprite.visible = false;
-						c.sprite.setInteractive();
-						this.setSpriteEvents(c.sprite, c, originalPileIndex);
+					if (from === "tableau") {
+						if (this.tableau[originalPileIndex].length > 0) {
+							let c = this.tableau[originalPileIndex][this.tableau[originalPileIndex].length - 1];
+							c.isFaceUp = true;
+							c.sprite.visible = true;
+							c.backImageSprite.visible = false;
+							c.sprite.setInteractive();
+							this.setSpriteEvents(c.sprite, c, originalPileIndex);
+						}
 					}
 					let counter = 0;
 					for (let k = 0; k < this.foundationPiles.length; k++) {
@@ -326,18 +346,45 @@ class Level extends Phaser.Scene {
 					}
 				}
 			}
-			if (!destPile) {
+			if (!destPile && from === "tableau") {
 				// Return the cards to their original positions
-				for (let l = 0; l < cardsToMove.length; l++) {
-					let cardToMove = cardsToMove[l];
+				for (let l = 0; l < this.cardstomove.length; l++) {
+					let cardToMove = this.cardstomove[l];
 					cardToMove.sprite.x = cardOrginalPositions[l].x;
 					cardToMove.sprite.y = cardOrginalPositions[l].y;
 					cardToMove.sprite.depth = 0;
 					this.tableau[originalPileIndex].push(cardToMove);
 				}
 			}
+			if (!destPile && from === "deck") {
+				// Return the cards to their original positions
+				for (let l = 0; l < this.cardstomove.length; l++) {
+					let cardToMove = this.cardstomove[l];
+					cardToMove.sprite.x = cardOrginalPositions[l].x;
+					cardToMove.sprite.y = cardOrginalPositions[l].y;
+					cardToMove.sprite.depth = this.deckIndex - 1;
+				}
+				if (this.cardstomove.length > 0) {
+					this.deck.splice(this.deckIndex, 0, this.deck[this.deckIndex]);
+					this.activeDeckCard = this.deck[this.deckIndex];
+				}
+			}
+
 			console.log(this.tableau);
-			cardsToMove = [];
+			this.cardstomove = [];
+			this.cardstomove = [];
+		}, this);
+	}
+
+	cardstomove = [];
+	onPointerMove() {
+		this.input.on('pointermove', (pointer) => {
+			for (let l = 0; l < this.cardstomove.length; l++) {
+				let cardToMove = this.cardstomove[l];
+				cardToMove.sprite.depth = 50;
+				cardToMove.sprite.x = pointer.x;
+				cardToMove.sprite.y = pointer.y + (l * 20) + 57;
+			}
 		}, this);
 	}
 
@@ -350,6 +397,8 @@ class Level extends Phaser.Scene {
 
 		// check if the card can be placed on the top of the pile
 		let topCard = pile[pile.length - 1];
+		console.log("top card", topCard);
+		console.log("pile", pile);
 		if (topCard && topCard.isFaceUp && this.getColor(topCard.suit) !== this.getColor(card.suit) && this.ranks.indexOf(topCard.rank) === this.ranks.indexOf(card.rank) + 1) {
 			return true;
 		}
@@ -357,7 +406,8 @@ class Level extends Phaser.Scene {
 	}
 
 	// to get the destination pile
-	getClosestValidPile(x, y, piles, cardsToMove) {
+	getClosestValidPile(x, y, piles) {
+		if (this.cardstomove.length === 0) return null;
 		let closestPile = null;
 		for (let i = 0; i < piles.length; i++) {
 			let pile = piles[i];
@@ -366,7 +416,7 @@ class Level extends Phaser.Scene {
 			}
 			let pileX = 82 + i * 104;
 			let isInRange = x >= pileX - 45 && x <= pileX + 45 && y >= 225;
-			if (isInRange && this.canMoveToPile(cardsToMove[0], pile)) {
+			if (isInRange && this.canMoveToPile(this.cardstomove[0], pile)) {
 				closestPile = pile;
 				break;
 			}
@@ -388,13 +438,13 @@ class Level extends Phaser.Scene {
 	}
 
 	// to get the destination foundation pile
-	getClosestValidFoundationPile(x, y, piles, cardsToMove) {
-		if (cardsToMove.length > 1) return null;
+	getClosestValidFoundationPile(x, y, piles) {
+		if (this.cardstomove.length > 1) return null;
 		let closestPile = null;
 		for (let i = 0; i < piles.length; i++) {
 			let pileX = this.foundationPilesStartX + i * 104;
 			let isInRange = x >= pileX - 45 && x <= pileX + 45 && y >= this.foundationPilesStartY && y <= this.foundationPilesStartY + 62;
-			if (isInRange && this.canMoveToFoundation(cardsToMove[0], piles[i])) {
+			if (isInRange && this.canMoveToFoundation(this.cardstomove[0], piles[i])) {
 				closestPile = piles[i];
 				break;
 			}
@@ -411,25 +461,60 @@ class Level extends Phaser.Scene {
 		}
 	}
 
+	deckIndex = 0;
+	activeDeckCard = null;
 	// for deck
 	Deck() {
+		let deckOption = localStorage.getItem("deckOption");
+		if (!deckOption) deckOption = 1;
+		let backSprite;
 		let retrySprite = this.add.sprite(81, 142, "retry");
 		retrySprite.displayHeight = 110;
 		retrySprite.displayWidth = 90;
 		retrySprite.setInteractive();
 		retrySprite.on('pointerdown', () => {
-			console.log("retry");
+			if (this.deck.length === 0) return;
+			this.deckIndex = 0;
+			this.deck.forEach((card) => {
+				card.sprite.visible = false;
+				card.sprite.x = 81;
+			});
+			backSprite.visible = true;
+			this.activeDeckCard = null;
 		}, this);
 
-		let backSprite = this.add.sprite(81, 142, "card-back");
+		backSprite = this.add.sprite(81, 142, "card-back");
 		backSprite.displayHeight = 125;
 		backSprite.displayWidth = 90;
 		backSprite.setInteractive();
 		backSprite.on('pointerdown', () => {
-			this.deck.forEach((card) => {
-				// this.setSpriteEvents(card.sprite, card);
-			});
+			if (this.deckIndex < this.deck.length) {
+				this.deck[this.deckIndex].sprite.visible = true;
+				this.deck[this.deckIndex].sprite.depth = this.deckIndex;
+				let i = this.deckIndex;
+				let interval = setInterval(() => {
+					this.deck[i].sprite.x += 5;
+					if (this.deck[i].sprite.x >= 190) {
+						clearInterval(interval);
+					}
+				}, 0.001);
+				this.activeDeckCard = this.deck[this.deckIndex];
+				this.deckIndex++;
+			}
+			if (this.deckIndex === this.deck.length) {
+				backSprite.visible = false;
+			}
 		}, this);
+
+		this.deck.forEach((card) => {
+			card.sprite = this.add.sprite(81, 142, card.suit + card.rank);
+			card.sprite.displayHeight = 125;
+			card.sprite.displayWidth = 90;
+			card.sprite.setInteractive();
+			card.sprite.visible = false;
+			card.isFaceUp = true;
+			this.setSpriteEvents(card.sprite, card);
+		});
 	}
 
 	create() {
@@ -439,6 +524,7 @@ class Level extends Phaser.Scene {
 		this.createTableau();
 		this.renderTableau();
 		this.Deck();
+		this.onPointerMove();
 	}
 
 	/* END-USER-CODE */

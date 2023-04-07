@@ -211,22 +211,12 @@ class Level extends Phaser.Scene {
 				cardToMove.sprite.x = pointer.x;
 				cardToMove.sprite.y = pointer.y + 57;
 				from = "deck";
-				this.deck.splice(this.deckIndex - 1, 1);
-				if (this.deckIndex > 0) {
-					this.deckIndex--;
-					this.activeDeckCard = this.deck[this.deckIndex];
-				} else {
-					this.activeDeckCard = null;
-				}
-				console.log(this.activeDeckCard);
-				console.log(this.deckIndex);
 			}
 
 			// if card is from the tableau piles
 			if (from === "tableau") {
 				console.log(" from tableau");
 				this.cardstomove = [card];
-				console.log("card To Move", this.cardstomove[0]);
 				while (k < this.tableau[originalPileIndex].length) {
 					let nextCard = this.tableau[originalPileIndex][k];
 					if (nextCard.isFaceUp) {
@@ -364,14 +354,11 @@ class Level extends Phaser.Scene {
 					cardToMove.sprite.y = cardOrginalPositions[l].y;
 					cardToMove.sprite.depth = this.deckIndex - 1;
 				}
-				if (this.cardstomove.length > 0) {
-					this.deck.splice(this.deckIndex, 0, this.deck[this.deckIndex]);
-					this.activeDeckCard = this.deck[this.deckIndex];
-				}
 			}
-
-			console.log(this.tableau);
-			this.cardstomove = [];
+			console.log( "tableau", this.tableau);
+			console.log( "foundationPiles", this.foundationPiles);
+			console.log( "deck", this.deck);
+			console.log( "activeDeckCard", this.activeDeckCard);
 			this.cardstomove = [];
 		}, this);
 	}
@@ -397,8 +384,6 @@ class Level extends Phaser.Scene {
 
 		// check if the card can be placed on the top of the pile
 		let topCard = pile[pile.length - 1];
-		console.log("top card", topCard);
-		console.log("pile", pile);
 		if (topCard && topCard.isFaceUp && this.getColor(topCard.suit) !== this.getColor(card.suit) && this.ranks.indexOf(topCard.rank) === this.ranks.indexOf(card.rank) + 1) {
 			return true;
 		}
@@ -478,6 +463,7 @@ class Level extends Phaser.Scene {
 			this.deck.forEach((card) => {
 				card.sprite.visible = false;
 				card.sprite.x = 81;
+				card.sprite.depth = 0;
 			});
 			backSprite.visible = true;
 			this.activeDeckCard = null;
@@ -494,10 +480,10 @@ class Level extends Phaser.Scene {
 				let i = this.deckIndex;
 				let interval = setInterval(() => {
 					this.deck[i].sprite.x += 5;
-					if (this.deck[i].sprite.x >= 190) {
+					if (this.deck[i].sprite.x >= 186) {
 						clearInterval(interval);
 					}
-				}, 0.001);
+				}, 1);
 				this.activeDeckCard = this.deck[this.deckIndex];
 				this.deckIndex++;
 			}

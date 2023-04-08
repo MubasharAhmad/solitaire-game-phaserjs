@@ -319,7 +319,7 @@ class Level extends Phaser.Scene {
 							let c = this.tableau[originalPileIndex][this.tableau[originalPileIndex].length - 1];
 							c.isFaceUp = true;
 							c.sprite.visible = true;
-							c.backImageSprite.visible = false;
+							if (c.backImageSprite) c.backImageSprite.visible = false;
 							c.sprite.setInteractive();
 							this.setSpriteEvents(c.sprite, c, originalPileIndex);
 						}
@@ -334,6 +334,16 @@ class Level extends Phaser.Scene {
 						alert("Congratulations! You win!");
 						window.location.reload();
 					}
+				}
+			}
+			if (destPile && from === "deck") {
+				console.log("deck index", this.deckIndex);
+				this.deck.splice(this.deckIndex - 1, 1);
+				if (this.deckIndex - 1 > 0) {
+					this.deckIndex--;
+					this.activeDeckCard = this.deck[this.deckIndex - 1];
+				} else {
+					this.activeDeckCard = null;
 				}
 			}
 			if (!destPile && from === "tableau") {
@@ -355,10 +365,10 @@ class Level extends Phaser.Scene {
 					cardToMove.sprite.depth = this.deckIndex - 1;
 				}
 			}
-			console.log( "tableau", this.tableau);
-			console.log( "foundationPiles", this.foundationPiles);
-			console.log( "deck", this.deck);
-			console.log( "activeDeckCard", this.activeDeckCard);
+			console.log("tableau", this.tableau);
+			console.log("foundationPiles", this.foundationPiles);
+			console.log("deck", this.deck);
+			console.log("activeDeckCard", this.activeDeckCard);
 			this.cardstomove = [];
 		}, this);
 	}

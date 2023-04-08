@@ -12,16 +12,16 @@
     "displayList": [
         {
             "type": "Image",
-            "id": "e413cbbf-ce25-4dad-a117-b7cf0791f655",
-            "label": "guapen",
+            "id": "c60ba2e5-1f0c-477c-b480-b62770f03a26",
+            "label": "logo",
             "components": [],
             "texture": {
-                "key": "guapen"
+                "key": "logo"
             },
             "x": 400,
-            "y": 219,
-            "scaleX": 0.5915891440784282,
-            "scaleY": 0.5915891440784282
+            "y": 284,
+            "scaleX": 0.15332245110188414,
+            "scaleY": 0.15332245110188414
         },
         {
             "type": "Text",

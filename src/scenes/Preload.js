@@ -22,10 +22,10 @@ class Preload extends Phaser.Scene {
 	/** @returns {void} */
 	editorCreate() {
 
-		// guapen
-		const guapen = this.add.image(400, 219, "guapen");
-		guapen.scaleX = 0.5915891440784282;
-		guapen.scaleY = 0.5915891440784282;
+		// logo
+		const logo = this.add.image(400, 284, "logo");
+		logo.scaleX = 0.15332245110188414;
+		logo.scaleY = 0.15332245110188414;
 
 		// progress
 		const progress = this.add.text(400, 349, "", {});

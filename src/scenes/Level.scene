@@ -13,26 +13,7 @@
             "label": "Top Bar",
             "components": [],
             "x": 1,
-            "list": [
-                {
-                    "type": "TileSprite",
-                    "id": "7e81b9dc-cc52-45b2-97f2-f3531e1a64c1",
-                    "label": "tilesprite_1",
-                    "components": [],
-                    "texture": {},
-                    "x": 403,
-                    "y": 25,
-                    "scaleX": 12.80173314451295,
-                    "scaleY": 0.9576815236056202,
-                    "tintTopLeft": "#d0d0d0",
-                    "tintTopRight": "#d0d0d0",
-                    "tintBottomLeft": "#d0d0d0",
-                    "tintBottomRight": "#d0d0d0",
-                    "tintFill": true,
-                    "width": 64,
-                    "height": 64
-                }
-            ]
+            "list": []
         },
         {
             "type": "Image",

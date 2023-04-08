@@ -5,6 +5,11 @@
                 "url": "assets/guapen.png",
                 "type": "image",
                 "key": "guapen"
+            },
+            {
+                "url": "assets/logo.jpg",
+                "type": "image",
+                "key": "logo"
             }
         ]
     },

@@ -19,17 +19,6 @@ class Level extends Phaser.Scene {
 		// Top Bar
 		const top_Bar = this.add.container(1, 0);
 
-		// tilesprite_1
-		const tilesprite_1 = this.add.tileSprite(403, 25, 64, 64, "_MISSING");
-		tilesprite_1.scaleX = 12.80173314451295;
-		tilesprite_1.scaleY = 0.9576815236056202;
-		tilesprite_1.tintFill = true;
-		tilesprite_1.tintTopLeft = 13684944;
-		tilesprite_1.tintTopRight = 13684944;
-		tilesprite_1.tintBottomLeft = 13684944;
-		tilesprite_1.tintBottomRight = 13684944;
-		top_Bar.add(tilesprite_1);
-
 		// placeholder
 		const placeholder = this.add.image(705, 142, "placeholder");
 		placeholder.scaleX = 0.2992899054086054;
@@ -328,6 +317,7 @@ class Level extends Phaser.Scene {
 			}
 			if (destPile && from === "deck") {
 				this.activeDeckCards.pop();
+				this.visualizeActiveDeckCard();
 				if (this.activeDeckCards.length > 0) {
 					this.activeDeckCard = this.activeDeckCards[this.activeDeckCards.length - 1];
 				} else {
@@ -458,6 +448,7 @@ class Level extends Phaser.Scene {
 
 	activeDeckCard = null;
 	activeDeckCards = [];
+	deckOption;
 	// for deck
 	Deck() {
 		let backSprite;
@@ -483,20 +474,18 @@ class Level extends Phaser.Scene {
 		backSprite.displayHeight = 125;
 		backSprite.displayWidth = 90;
 		backSprite.setInteractive();
-		let deckOption = localStorage.getItem("deckOption");
-		if (!deckOption) deckOption = 1;
+		this.deckOption = localStorage.getItem("deckOption");
+		if (!this.deckOption) this.deckOption = 3;
 		backSprite.on('pointerdown', () => {
 			if (this.deck.length > 0) {
-				for (let i = 0; i < deckOption; i++) {
+				for (let i = 0; i < this.deckOption; i++) {
 					if (this.deck.length === 0) break;
 					let card = this.deck.pop();
-					// card.sprite.visible = true;
 					card.sprite.depth = this.activeDeckCards.length + 1;
 					card.sprite.x = 186;
 					this.activeDeckCards.push(card);
 				}
-				for (let i = 0; i < this.activeDeckCards.length; i++) {
-				}
+				this.visualizeActiveDeckCard();
 				this.activeDeckCard = this.activeDeckCards[this.activeDeckCards.length - 1];
 			}
 			if (this.deck.length === 0) {
@@ -515,6 +504,24 @@ class Level extends Phaser.Scene {
 		});
 	}
 
+	// to visualize the active deck cards
+	visualizeActiveDeckCard() {
+		this.activeDeckCards.forEach((card) => {
+			card.sprite.visible = false;
+		});
+		let li = [];
+		if (this.deckOption > this.activeDeckCards.length) {
+			li = this.activeDeckCards;
+		} else {
+			li = this.activeDeckCards.slice(-this.deckOption);
+		}
+		for (let i = 0; i < li.length; i++) {
+			let card = li[i];
+			card.sprite.visible = true;
+			card.sprite.x = 186 + i * 25;
+		}
+	}
+
 	create() {
 		this.editorCreate();
 		this.createDeck();
@@ -523,15 +530,6 @@ class Level extends Phaser.Scene {
 		this.renderTableau();
 		this.Deck();
 		this.onPointerMove();
-		let A = [1, 2, 3, 4, 5];
-		let n = 3;
-		if (n > A.length) {
-			console.log(A);
-		} else {
-			let B = A.slice(-n);
-			console.log(B);
-			console.log(A);
-		}
 	}
 
 	/* END-USER-CODE */

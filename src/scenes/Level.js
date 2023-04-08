@@ -324,24 +324,12 @@ class Level extends Phaser.Scene {
 							this.setSpriteEvents(c.sprite, c, originalPileIndex);
 						}
 					}
-					let counter = 0;
-					for (let k = 0; k < this.foundationPiles.length; k++) {
-						if (this.foundationPiles[k].length === 13) {
-							counter++;
-						}
-					}
-					if (counter === 4) {
-						alert("Congratulations! You win!");
-						window.location.reload();
-					}
 				}
 			}
 			if (destPile && from === "deck") {
-				console.log("deck index", this.deckIndex);
-				this.deck.splice(this.deckIndex - 1, 1);
-				if (this.deckIndex - 1 > 0) {
-					this.deckIndex--;
-					this.activeDeckCard = this.deck[this.deckIndex - 1];
+				this.activeDeckCards.pop();
+				if (this.activeDeckCards.length > 0) {
+					this.activeDeckCard = this.activeDeckCards[this.activeDeckCards.length - 1];
 				} else {
 					this.activeDeckCard = null;
 				}
@@ -362,7 +350,7 @@ class Level extends Phaser.Scene {
 					let cardToMove = this.cardstomove[l];
 					cardToMove.sprite.x = cardOrginalPositions[l].x;
 					cardToMove.sprite.y = cardOrginalPositions[l].y;
-					cardToMove.sprite.depth = this.deckIndex - 1;
+					cardToMove.sprite.depth = this.activeDeckCards.length;
 				}
 			}
 			console.log("tableau", this.tableau);
@@ -370,6 +358,18 @@ class Level extends Phaser.Scene {
 			console.log("deck", this.deck);
 			console.log("activeDeckCard", this.activeDeckCard);
 			this.cardstomove = [];
+			let counter = 0;
+			for (let k = 0; k < this.foundationPiles.length; k++) {
+				if (this.foundationPiles[k].length === 13) {
+					counter++;
+				}
+			}
+			if (counter === 4) {
+				setTimeout(() => {
+					alert("Congratulations! You win!");
+					window.location.reload();
+				}, 100);
+			}
 		}, this);
 	}
 
@@ -456,25 +456,25 @@ class Level extends Phaser.Scene {
 		}
 	}
 
-	deckIndex = 0;
 	activeDeckCard = null;
+	activeDeckCards = [];
 	// for deck
 	Deck() {
-		let deckOption = localStorage.getItem("deckOption");
-		if (!deckOption) deckOption = 1;
 		let backSprite;
 		let retrySprite = this.add.sprite(81, 142, "retry");
 		retrySprite.displayHeight = 110;
 		retrySprite.displayWidth = 90;
 		retrySprite.setInteractive();
 		retrySprite.on('pointerdown', () => {
-			if (this.deck.length === 0) return;
-			this.deckIndex = 0;
-			this.deck.forEach((card) => {
+			if (this.deck.length === 0 && this.activeDeckCards.length === 0) return;
+			let l = this.activeDeckCards.length;
+			for (let i = 0; i < l; i++) {
+				let card = this.activeDeckCards.pop();
 				card.sprite.visible = false;
 				card.sprite.x = 81;
 				card.sprite.depth = 0;
-			});
+				this.deck.push(card);
+			}
 			backSprite.visible = true;
 			this.activeDeckCard = null;
 		}, this);
@@ -483,21 +483,23 @@ class Level extends Phaser.Scene {
 		backSprite.displayHeight = 125;
 		backSprite.displayWidth = 90;
 		backSprite.setInteractive();
+		let deckOption = localStorage.getItem("deckOption");
+		if (!deckOption) deckOption = 1;
 		backSprite.on('pointerdown', () => {
-			if (this.deckIndex < this.deck.length) {
-				this.deck[this.deckIndex].sprite.visible = true;
-				this.deck[this.deckIndex].sprite.depth = this.deckIndex;
-				let i = this.deckIndex;
-				let interval = setInterval(() => {
-					this.deck[i].sprite.x += 5;
-					if (this.deck[i].sprite.x >= 186) {
-						clearInterval(interval);
-					}
-				}, 1);
-				this.activeDeckCard = this.deck[this.deckIndex];
-				this.deckIndex++;
+			if (this.deck.length > 0) {
+				for (let i = 0; i < deckOption; i++) {
+					if (this.deck.length === 0) break;
+					let card = this.deck.pop();
+					// card.sprite.visible = true;
+					card.sprite.depth = this.activeDeckCards.length + 1;
+					card.sprite.x = 186;
+					this.activeDeckCards.push(card);
+				}
+				for (let i = 0; i < this.activeDeckCards.length; i++) {
+				}
+				this.activeDeckCard = this.activeDeckCards[this.activeDeckCards.length - 1];
 			}
-			if (this.deckIndex === this.deck.length) {
+			if (this.deck.length === 0) {
 				backSprite.visible = false;
 			}
 		}, this);
@@ -521,6 +523,15 @@ class Level extends Phaser.Scene {
 		this.renderTableau();
 		this.Deck();
 		this.onPointerMove();
+		let A = [1, 2, 3, 4, 5];
+		let n = 3;
+		if (n > A.length) {
+			console.log(A);
+		} else {
+			let B = A.slice(-n);
+			console.log(B);
+			console.log(A);
+		}
 	}
 
 	/* END-USER-CODE */

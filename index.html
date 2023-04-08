@@ -114,11 +114,15 @@
 		});
 		turn1Btn.addEventListener('click', () => {
 			if (option === 1) return;
+			let confirm = window.confirm('Are you sure you want to turn on?');
+			if (!confirm) return;
 			window.localStorage.setItem('deckOption', 1);
 			window.location.reload();
 		});
 		turn3Btn.addEventListener('click', () => {
 			if (option === 3) return;
+			let confirm = window.confirm('Are you sure you want to turn on?');
+			if (!confirm) return;
 			window.localStorage.setItem('deckOption', 3);
 			window.location.reload();
 		});

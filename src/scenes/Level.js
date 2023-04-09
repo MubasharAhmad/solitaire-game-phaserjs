@@ -173,6 +173,12 @@ class Level extends Phaser.Scene {
 		let cardOrginalPositions = [];
 		let originalPileIndex;
 		let from;
+
+		let crds = [];
+		let frm = null;
+		let to = null;
+		let isTableauTop = false;
+
 		sprite.on('pointerdown', (pointer) => {
 			this.foundationPiles.forEach((pile) => {
 				pile.forEach((c) => {
@@ -190,6 +196,7 @@ class Level extends Phaser.Scene {
 						k = j + 1;
 						originalPileIndex = i;
 						from = "tableau";
+						frm = { type: "tableau", list: this.tableau[i] };
 						break;
 					}
 				}
@@ -197,12 +204,16 @@ class Level extends Phaser.Scene {
 
 			// if card is from the deck
 			if (card === this.activeDeckCard) {
-				console.log(" from deck");
+				frm = { type: "activeDeck", list: this.activeDeckCards };
 				this.cardstomove = [card];
 				cardOrginalPositions = [{
 					x: card.sprite.x,
 					y: card.sprite.y
 				}];
+				crds.push({
+					card: card,
+					originalCardState: new OriginalCardState(card.sprite.x, card.sprite.y, card.sprite.depth, card.sprite.visible, card.isFaceUp)
+				});
 				let cardToMove = this.cardstomove[0];
 				cardToMove.sprite.x = pointer.x;
 				cardToMove.sprite.y = pointer.y + 57;
@@ -211,12 +222,19 @@ class Level extends Phaser.Scene {
 
 			// if card is from the tableau piles
 			if (from === "tableau") {
-				console.log(" from tableau");
 				this.cardstomove = [card];
+				crds.push({
+					card: card,
+					originalCardState: new OriginalCardState(card.sprite.x, card.sprite.y, card.sprite.depth, card.sprite.visible, card.isFaceUp)
+				});
 				while (k < this.tableau[originalPileIndex].length) {
 					let nextCard = this.tableau[originalPileIndex][k];
 					if (nextCard.isFaceUp) {
 						this.cardstomove.push(nextCard);
+						crds.push({
+							card: nextCard,
+							originalCardState: new OriginalCardState(nextCard.sprite.x, nextCard.sprite.y, nextCard.sprite.depth, nextCard.sprite.visible, nextCard.isFaceUp)
+						});
 					} else {
 						break;
 					}
@@ -255,6 +273,7 @@ class Level extends Phaser.Scene {
 			if (pointer.y >= 225) {
 				destPile = this.getClosestValidPile(pointer.x, pointer.y, this.tableau);
 				if (destPile) {
+					to = { type: "tableau", list: destPile };
 					// Move the cards to the new pile
 					let x;
 					let y;
@@ -277,6 +296,7 @@ class Level extends Phaser.Scene {
 					if (from === "tableau") {
 						if (this.tableau[originalPileIndex].length > 0) {
 							let c = this.tableau[originalPileIndex][this.tableau[originalPileIndex].length - 1];
+							if (!c.isFaceUp) isTableauTop = true;
 							c.isFaceUp = true;
 							c.sprite.visible = true;
 							if (c.backImageSprite) c.backImageSprite.visible = false;
@@ -290,6 +310,7 @@ class Level extends Phaser.Scene {
 			} else {
 				destPile = this.getClosestValidFoundationPile(pointer.x, pointer.y, this.foundationPiles);
 				if (destPile) {
+					to = { type: "foundation", list: destPile };
 					if (this.cardstomove[0].rank === "A") {
 						for (let k = 0; k < this.foundationPiles.length; k++) {
 							if (this.foundationPiles[k].length === 1 && this.cardstomove[0].suit === this.foundationPiles[k][0].suit) {
@@ -315,6 +336,7 @@ class Level extends Phaser.Scene {
 					if (from === "tableau") {
 						if (this.tableau[originalPileIndex].length > 0) {
 							let c = this.tableau[originalPileIndex][this.tableau[originalPileIndex].length - 1];
+							if (!c.isFaceUp) isTableauTop = true;
 							c.isFaceUp = true;
 							c.sprite.visible = true;
 							if (c.backImageSprite) c.backImageSprite.visible = false;
@@ -357,10 +379,13 @@ class Level extends Phaser.Scene {
 					cardToMove.sprite.depth = this.activeDeckCards.length;
 				}
 			}
-			console.log("tableau", this.tableau);
-			console.log("foundationPiles", this.foundationPiles);
-			console.log("deck", this.deck);
-			console.log("activeDeckCard", this.activeDeckCard);
+			if (to) {
+				this.moves.push(new Move(crds, frm, to, isTableauTop));
+			}
+			crds = [];
+			frm = null;
+			to = null;
+			isTableauTop = false;
 			this.cardstomove = [];
 			let counter = 0;
 			for (let k = 0; k < this.foundationPiles.length; k++) {
@@ -519,7 +544,6 @@ class Level extends Phaser.Scene {
 				this.backSprite.visible = false;
 			}
 			this.moves.push(new Move(crds, { type: "deck", list: this.deck }, { type: "activeDeck", list: this.activeDeckCards }));
-			console.log(this.moves);
 		}, this);
 
 		this.deck.forEach((card) => {
@@ -559,7 +583,7 @@ class Level extends Phaser.Scene {
 		this.undoBtn.addEventListener("click", () => {
 			if (this.moves.length === 0) return;
 			let move = this.moves.pop();
-			if (move.isTableauTop) {
+			if (move.isTableauTop && move.from.list.length > 0 && move.from.type === 'tableau') {
 				move.from.list[move.from.list.length - 1].sprite.visible = false;
 				move.from.list[move.from.list.length - 1].backImageSprite.visible = true;
 				move.from.list[move.from.list.length - 1].isFaceUp = false;
@@ -570,7 +594,6 @@ class Level extends Phaser.Scene {
 			for (let i = 0; i < l; i++) {
 				move.to.list.pop();
 				let c = move.cards.pop();
-				console.log(c);
 				c.card.sprite.x = c.originalCardState.x;
 				c.card.sprite.y = c.originalCardState.y;
 				c.card.sprite.depth = c.originalCardState.depth;
@@ -578,8 +601,6 @@ class Level extends Phaser.Scene {
 				c.card.sprite.visible = c.originalCardState.visible;
 				move.from.list.push(c.card);
 			}
-			console.log(this.deck);
-			console.log(this.activeDeckCards);
 			if (move.from.type === "deck" || move.from.type === "activeDeck") {
 				this.visualizeActiveDeckCard();
 				this.backSprite.visible = this.deck.length > 0;
@@ -599,7 +620,6 @@ class Level extends Phaser.Scene {
 		let A = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 		let B = [1, 2, 3]
 		A = A.filter((a) => !(a in B));
-		console.log(A);
 	}
 
 	/* END-USER-CODE */

@@ -174,6 +174,13 @@ class Level extends Phaser.Scene {
 		let originalPileIndex;
 		let from;
 		sprite.on('pointerdown', (pointer) => {
+			this.foundationPiles.forEach((pile) => {
+				pile.forEach((c) => {
+					if (c === card) from = "foundation";
+				});
+			});
+			if (from === "foundation") return;
+
 			// Keep track of the cards being dragged
 			let k;
 			for (let i = 0; i < this.tableau.length; i++) {
@@ -317,6 +324,9 @@ class Level extends Phaser.Scene {
 					}
 					this.score += 10;
 					this.scoreText.innerHTML = "Score: " + this.score;
+					this.tableau.forEach(pile => {
+						pile = pile.filter(card => card == this.cardstomove[0]);
+					});
 				}
 			}
 			if (destPile && from === "deck") {
@@ -531,7 +541,10 @@ class Level extends Phaser.Scene {
 	}
 
 	undoBtn = document.getElementById("undo-btn");
+	moves = [];
 	undo() {
+		this.undoBtn.addEventListener("click", () => {
+		});
 	}
 
 	create() {
@@ -542,6 +555,7 @@ class Level extends Phaser.Scene {
 		this.renderTableau();
 		this.Deck();
 		this.onPointerMove();
+		this.undo();
 	}
 
 	/* END-USER-CODE */

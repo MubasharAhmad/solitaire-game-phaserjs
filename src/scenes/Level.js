@@ -277,6 +277,8 @@ class Level extends Phaser.Scene {
 							this.setSpriteEvents(c.sprite, c, originalPileIndex);
 						}
 					}
+					this.score += 5;
+					this.scoreText.innerHTML = "Score: " + this.score;
 				}
 			} else {
 				destPile = this.getClosestValidFoundationPile(pointer.x, pointer.y, this.foundationPiles);
@@ -313,6 +315,8 @@ class Level extends Phaser.Scene {
 							this.setSpriteEvents(c.sprite, c, originalPileIndex);
 						}
 					}
+					this.score += 10;
+					this.scoreText.innerHTML = "Score: " + this.score;
 				}
 			}
 			if (destPile && from === "deck") {
@@ -449,6 +453,8 @@ class Level extends Phaser.Scene {
 	activeDeckCard = null;
 	activeDeckCards = [];
 	deckOption;
+	score = 0;
+	scoreText = document.getElementById("score");
 	// for deck
 	Deck() {
 		let backSprite;
@@ -506,9 +512,11 @@ class Level extends Phaser.Scene {
 
 	// to visualize the active deck cards
 	visualizeActiveDeckCard() {
-		this.activeDeckCards.forEach((card) => {
-			card.sprite.visible = false;
-		});
+		if (this.deckOption != 1) {
+			this.activeDeckCards.forEach((card) => {
+				card.sprite.visible = false;
+			});
+		}
 		let li = [];
 		if (this.deckOption > this.activeDeckCards.length) {
 			li = this.activeDeckCards;
@@ -520,6 +528,10 @@ class Level extends Phaser.Scene {
 			card.sprite.visible = true;
 			card.sprite.x = 186 + i * 25;
 		}
+	}
+
+	undoBtn = document.getElementById("undo-btn");
+	undo() {
 	}
 
 	create() {

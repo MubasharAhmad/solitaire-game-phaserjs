@@ -325,7 +325,7 @@ class Level extends Phaser.Scene {
 					this.score += 10;
 					this.scoreText.innerHTML = "Score: " + this.score;
 					this.tableau.forEach(pile => {
-						pile = pile.filter(card => card == this.cardstomove[0]);
+						pile = pile.filter(card => card !== this.cardstomove[0]);
 					});
 				}
 			}
@@ -465,9 +465,9 @@ class Level extends Phaser.Scene {
 	deckOption;
 	score = 0;
 	scoreText = document.getElementById("score");
+	backSprite;
 	// for deck
 	Deck() {
-		let backSprite;
 		let retrySprite = this.add.sprite(81, 142, "retry");
 		retrySprite.displayHeight = 110;
 		retrySprite.displayWidth = 90;
@@ -475,28 +475,39 @@ class Level extends Phaser.Scene {
 		retrySprite.on('pointerdown', () => {
 			if (this.deck.length === 0 && this.activeDeckCards.length === 0) return;
 			let l = this.activeDeckCards.length;
+			let crds = [];
 			for (let i = 0; i < l; i++) {
 				let card = this.activeDeckCards.pop();
+				crds.push({
+					card: card,
+					originalCardState: new OriginalCardState(card.sprite.x, card.sprite.y, card.sprite.depth, card.sprite.visible, card.isFaceUp)
+				});
 				card.sprite.visible = false;
 				card.sprite.x = 81;
 				card.sprite.depth = 0;
 				this.deck.push(card);
 			}
-			backSprite.visible = true;
+			this.moves.push(new Move(crds, { type: 'activeDeck', list: this.activeDeckCards }, { type: 'deck', list: this.deck }));
+			this.backSprite.visible = true;
 			this.activeDeckCard = null;
 		}, this);
 
-		backSprite = this.add.sprite(81, 142, "card-back");
-		backSprite.displayHeight = 125;
-		backSprite.displayWidth = 90;
-		backSprite.setInteractive();
+		this.backSprite = this.add.sprite(81, 142, "card-back");
+		this.backSprite.displayHeight = 125;
+		this.backSprite.displayWidth = 90;
+		this.backSprite.setInteractive();
 		this.deckOption = localStorage.getItem("deckOption");
 		if (!this.deckOption) this.deckOption = 3;
-		backSprite.on('pointerdown', () => {
+		this.backSprite.on('pointerdown', () => {
+			let crds = [];
 			if (this.deck.length > 0) {
 				for (let i = 0; i < this.deckOption; i++) {
 					if (this.deck.length === 0) break;
 					let card = this.deck.pop();
+					crds.push({
+						card: card,
+						originalCardState: new OriginalCardState(card.sprite.x, card.sprite.y, card.sprite.depth, card.sprite.visible, card.isFaceUp)
+					});
 					card.sprite.depth = this.activeDeckCards.length + 1;
 					card.sprite.x = 186;
 					this.activeDeckCards.push(card);
@@ -505,8 +516,10 @@ class Level extends Phaser.Scene {
 				this.activeDeckCard = this.activeDeckCards[this.activeDeckCards.length - 1];
 			}
 			if (this.deck.length === 0) {
-				backSprite.visible = false;
+				this.backSprite.visible = false;
 			}
+			this.moves.push(new Move(crds, { type: "deck", list: this.deck }, { type: "activeDeck", list: this.activeDeckCards }));
+			console.log(this.moves);
 		}, this);
 
 		this.deck.forEach((card) => {
@@ -544,6 +557,33 @@ class Level extends Phaser.Scene {
 	moves = [];
 	undo() {
 		this.undoBtn.addEventListener("click", () => {
+			if (this.moves.length === 0) return;
+			let move = this.moves.pop();
+			if (move.isTableauTop) {
+				move.from.list[move.from.list.length - 1].sprite.visible = false;
+				move.from.list[move.from.list.length - 1].backImageSprite.visible = true;
+				move.from.list[move.from.list.length - 1].isFaceUp = false;
+				move.from.list[move.from.list.length - 1].sprite.depth = 0;
+				move.from.list[move.from.list.length - 1].backImageSprite.depth = 0;
+			}
+			let l = move.cards.length;
+			for (let i = 0; i < l; i++) {
+				move.to.list.pop();
+				let c = move.cards.pop();
+				console.log(c);
+				c.card.sprite.x = c.originalCardState.x;
+				c.card.sprite.y = c.originalCardState.y;
+				c.card.sprite.depth = c.originalCardState.depth;
+				c.card.isFaceUp = c.originalCardState.isFaceUp;
+				c.card.sprite.visible = c.originalCardState.visible;
+				move.from.list.push(c.card);
+			}
+			console.log(this.deck);
+			console.log(this.activeDeckCards);
+			if (move.from.type === "deck" || move.from.type === "activeDeck") {
+				this.visualizeActiveDeckCard();
+				this.backSprite.visible = this.deck.length > 0;
+			}
 		});
 	}
 
@@ -556,6 +596,10 @@ class Level extends Phaser.Scene {
 		this.Deck();
 		this.onPointerMove();
 		this.undo();
+		let A = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+		let B = [1, 2, 3]
+		A = A.filter((a) => !(a in B));
+		console.log(A);
 	}
 
 	/* END-USER-CODE */
@@ -564,3 +608,22 @@ class Level extends Phaser.Scene {
 /* END OF COMPILED CODE */
 
 // You can write more code here
+
+class Move {
+	constructor(cards, from, to, isTableauTop = false) {
+		this.cards = cards;
+		this.from = from;
+		this.to = to;
+		this.isTableauTop = isTableauTop;
+	}
+}
+
+class OriginalCardState {
+	constructor(x, y, depth, visible, isFaceUp) {
+		this.x = x;
+		this.y = y;
+		this.depth = depth;
+		this.visible = visible;
+		this.isFaceUp = isFaceUp;
+	}
+}

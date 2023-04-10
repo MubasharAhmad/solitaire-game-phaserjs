@@ -7,7 +7,7 @@ window.addEventListener('load', function () {
 		type: Phaser.AUTO,
         backgroundColor: "#ffffff",
 		scale: {
-			mode: Phaser.Scale.FIT
+			mode: Phaser.Scale.RESIZE
 		},
 		fps: {
 			target: 60

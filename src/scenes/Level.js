@@ -538,7 +538,6 @@ class Level extends Phaser.Scene {
 					this.activeDeckCards.push(card);
 				}
 				this.visualizeActiveDeckCard();
-				this.activeDeckCard = this.activeDeckCards[this.activeDeckCards.length - 1];
 			}
 			if (this.deck.length === 0) {
 				this.backSprite.visible = false;
@@ -575,6 +574,7 @@ class Level extends Phaser.Scene {
 			card.sprite.visible = true;
 			card.sprite.x = 186 + i * 25;
 		}
+		this.activeDeckCard = this.activeDeckCards[this.activeDeckCards.length - 1];
 	}
 
 	undoBtn = document.getElementById("undo-btn");
